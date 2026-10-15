@@ -2,8 +2,25 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
+  Future<bool>? _permissionCheck;
+
   /// Checks and requests necessary location permissions
-  Future<bool> checkPermission() async {
+  Future<bool> checkPermission() {
+    final pendingCheck = _permissionCheck;
+    if (pendingCheck != null) {
+      return pendingCheck;
+    }
+
+    final check = _checkPermission();
+    _permissionCheck = check;
+    return check.whenComplete(() {
+      if (identical(_permissionCheck, check)) {
+        _permissionCheck = null;
+      }
+    });
+  }
+
+  Future<bool> _checkPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return false;
@@ -31,10 +48,8 @@ class LocationService {
 
     try {
       return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 10),
-        ),
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 10),
       );
     } catch (_) {
       // Fallback to last known position if timeout
