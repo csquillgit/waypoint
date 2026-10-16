@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/waypoint.dart';
 
-class StorageService {
+class StorageService extends ChangeNotifier {
   static const String _waypointsKey = 'waypoint_saved_list';
   static const String _activeWaypointIdKey = 'waypoint_active_target_id';
   static const String _useImperialKey = 'waypoint_use_imperial';
@@ -38,7 +39,7 @@ class StorageService {
     list.removeWhere((item) => item.id == waypoint.id);
     list.insert(0, waypoint);
     await _saveList(list);
-    // Automatically set as active target
+    // Automatically set as active target (this triggers notifyListeners)
     await setActiveWaypointId(waypoint.id);
   }
 
@@ -52,7 +53,10 @@ class StorageService {
         await setActiveWaypointId(list.first.id);
       } else {
         await _prefs.remove(_activeWaypointIdKey);
+        notifyListeners();
       }
+    } else {
+      notifyListeners();
     }
   }
 
@@ -67,6 +71,7 @@ class StorageService {
 
   Future<void> setActiveWaypointId(String id) async {
     await _prefs.setString(_activeWaypointIdKey, id);
+    notifyListeners();
   }
 
   Waypoint? getActiveWaypoint() {
@@ -83,5 +88,6 @@ class StorageService {
 
   Future<void> setUseImperial(bool imperial) async {
     await _prefs.setBool(_useImperialKey, imperial);
+    notifyListeners();
   }
 }

@@ -31,7 +31,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     super.initState();
     _refreshList();
+    widget.storageService.addListener(_refreshList);
     _fetchCurrentPosition();
+  }
+
+  @override
+  void dispose() {
+    widget.storageService.removeListener(_refreshList);
+    super.dispose();
   }
 
   void _refreshList() {

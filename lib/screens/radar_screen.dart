@@ -41,12 +41,20 @@ class _RadarScreenState extends State<RadarScreen> {
     super.initState();
     _useImperial = widget.storageService.getUseImperial();
     _loadActiveWaypoint();
+    widget.storageService.addListener(_onStorageChanged);
     _startSensors();
+  }
+
+  void _onStorageChanged() {
+    if (mounted) {
+      _loadActiveWaypoint();
+    }
   }
 
   void _loadActiveWaypoint() {
     setState(() {
       _activeWaypoint = widget.storageService.getActiveWaypoint();
+      _useImperial = widget.storageService.getUseImperial();
     });
   }
 
@@ -100,6 +108,7 @@ class _RadarScreenState extends State<RadarScreen> {
 
   @override
   void dispose() {
+    widget.storageService.removeListener(_onStorageChanged);
     _positionSub?.cancel();
     _compassSub?.cancel();
     super.dispose();
