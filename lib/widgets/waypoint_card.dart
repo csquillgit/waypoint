@@ -11,6 +11,7 @@ class WaypointCard extends StatelessWidget {
   final bool useImperial;
   final VoidCallback onSelect;
   final VoidCallback onDelete;
+  final VoidCallback? onEdit;
 
   const WaypointCard({
     super.key,
@@ -18,6 +19,7 @@ class WaypointCard extends StatelessWidget {
     required this.isActive,
     required this.onSelect,
     required this.onDelete,
+    this.onEdit,
     this.currentLat,
     this.currentLon,
     this.useImperial = true,
@@ -62,6 +64,7 @@ class WaypointCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onSelect,
+          onLongPress: onEdit,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
             child: Row(
@@ -229,6 +232,21 @@ class WaypointCard extends StatelessWidget {
                           : const Color(0xFF475569),
                       size: 22,
                     ),
+
+                    if (onEdit != null) ...[
+                      const SizedBox(width: 2),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          color: Color(0xFF94A3B8),
+                          size: 19,
+                        ),
+                        splashRadius: 20,
+                        tooltip: 'Edit pin',
+                        onPressed: onEdit,
+                      ),
+                    ],
+
                     const SizedBox(width: 2),
 
                     // Delete Pin Button

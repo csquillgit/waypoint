@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/waypoint.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
+import '../widgets/edit_waypoint_dialog.dart';
 import '../widgets/waypoint_card.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -69,6 +70,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
           backgroundColor: Color(0xFF38BDF8),
         ),
       );
+    }
+  }
+
+  Future<void> _editWaypoint(Waypoint waypoint) async {
+    final updated = await showDialog<Waypoint>(
+      context: context,
+      builder: (context) => EditWaypointDialog(waypoint: waypoint),
+    );
+
+    if (updated != null) {
+      await widget.storageService.updateWaypoint(updated);
+      _refreshList();
     }
   }
 
@@ -182,6 +195,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     useImperial: _useImperial,
                     onSelect: () => _selectTarget(waypoint.id),
                     onDelete: () => _deleteWaypoint(waypoint),
+                    onEdit: () => _editWaypoint(waypoint),
                   );
                 },
               ),
