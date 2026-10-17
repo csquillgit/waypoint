@@ -39,7 +39,7 @@ class WaypointCard extends StatelessWidget {
     final formattedDate = DateFormat('MMM d, h:mm a').format(waypoint.createdAt);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF1E293B) : const Color(0xFF111827),
         borderRadius: BorderRadius.circular(16),
@@ -50,122 +50,203 @@ class WaypointCard extends StatelessWidget {
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: const Color(0xFF38BDF8).withOpacity(0.15),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
+                  color: const Color(0xFF38BDF8).withOpacity(0.18),
+                  blurRadius: 14,
+                  offset: const Offset(0, 3),
                 )
               ]
             : null,
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: isActive
-                ? const Color(0xFF38BDF8).withOpacity(0.2)
-                : const Color(0xFF1F2937),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            _getCategoryIcon(waypoint.category),
-            color: isActive ? const Color(0xFF38BDF8) : const Color(0xFF94A3B8),
-            size: 26,
-          ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                waypoint.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            if (isActive)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF38BDF8),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'LOCKED TARGET',
-                  style: TextStyle(
-                    color: Color(0xFF0F172A),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            if (waypoint.note != null && waypoint.note!.isNotEmpty) ...[
-              Text(
-                waypoint.note!,
-                style: const TextStyle(
-                  color: Color(0xFFCBD5E1),
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 4),
-            ],
-            Row(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onSelect,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (distanceText != null) ...[
-                  Text(
-                    distanceText,
-                    style: const TextStyle(
-                      color: Color(0xFF38BDF8),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
+                // Leading Category Icon + Status Dot
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? const Color(0xFF38BDF8).withOpacity(0.15)
+                            : const Color(0xFF1F2937),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isActive
+                              ? const Color(0xFF38BDF8).withOpacity(0.5)
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        _getCategoryIcon(waypoint.category),
+                        color: isActive ? const Color(0xFF38BDF8) : const Color(0xFF94A3B8),
+                        size: 24,
+                      ),
                     ),
+                    if (isActive)
+                      Positioned(
+                        top: -2,
+                        right: -2,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF38BDF8),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF1E293B),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(width: 14),
+
+                // Center Column: Active badge, Pin Name, Note, Distance & Date
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Active Target Micro-Badge
+                      if (isActive) ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF38BDF8).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: const Color(0xFF38BDF8).withOpacity(0.35),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.gps_fixed_rounded,
+                                size: 10,
+                                color: Color(0xFF38BDF8),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'ACTIVE TARGET',
+                                style: TextStyle(
+                                  color: Color(0xFF38BDF8),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+
+                      // Waypoint Name (clean 2-line max with ellipsis)
+                      Text(
+                        waypoint.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                          fontSize: 15,
+                          height: 1.25,
+                        ),
+                      ),
+
+                      if (waypoint.note != null && waypoint.note!.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          waypoint.note!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xFF94A3B8),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 4),
+
+                      // Distance & Date Row
+                      Row(
+                        children: [
+                          if (distanceText != null) ...[
+                            Text(
+                              distanceText,
+                              style: const TextStyle(
+                                color: Color(0xFF38BDF8),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const Text(
+                              ' • ',
+                              style: TextStyle(color: Color(0xFF64748B)),
+                            ),
+                          ],
+                          Text(
+                            formattedDate,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const Text(
-                    ' • ',
-                    style: TextStyle(color: Color(0xFF64748B)),
-                  ),
-                ],
-                Text(
-                  formattedDate,
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 12,
-                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Trailing Column: Selection indicator + Delete Button
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Radio / Checkmark Icon showing selection state
+                    Icon(
+                      isActive
+                          ? Icons.check_circle_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      color: isActive
+                          ? const Color(0xFF38BDF8)
+                          : const Color(0xFF475569),
+                      size: 22,
+                    ),
+                    const SizedBox(width: 2),
+
+                    // Delete Pin Button
+                    IconButton(
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Color(0xFFEF4444),
+                        size: 20,
+                      ),
+                      splashRadius: 20,
+                      tooltip: 'Delete pin',
+                      onPressed: onDelete,
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!isActive)
-              IconButton(
-                icon: const Icon(
-                  Icons.navigation_rounded,
-                  color: Color(0xFF38BDF8),
-                ),
-                tooltip: 'Lock as target',
-                onPressed: onSelect,
-              ),
-            IconButton(
-              icon: const Icon(
-                Icons.delete_outline_rounded,
-                color: Color(0xFFEF4444),
-                size: 20,
-              ),
-              tooltip: 'Delete pin',
-              onPressed: onDelete,
-            ),
-          ],
+          ),
         ),
       ),
     );
