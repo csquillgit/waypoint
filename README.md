@@ -23,7 +23,7 @@ It works **100% offline with zero cellular data or map downloads**, calculating 
 
 1. **Target Bearing ($\theta$):**
    Calculates the forward azimuth from your current GPS position $(lat_1, lon_1)$ to the target pin $(lat_2, lon_2)$:
-   $$\theta = \operatorname{atan2}\left(\sin(\Delta lon) \cdot \cos(lat_2),\ \cos(lat_1) \cdot \sin(lat_2) - \sin(lat_1) \cdot \cos(lat_2) \cdot \cos(\Delta lon)\right)$$
+   $$\theta = \mathrm{atan2}\left(\sin(\Delta lon) \cdot \cos(lat_2),\ \cos(lat_1) \cdot \sin(lat_2) - \sin(lat_1) \cdot \cos(lat_2) \cdot \cos(\Delta lon)\right)$$
 
 2. **Device Heading ($\psi$):**
    Monitored in real-time via the phone's internal 3-axis magnetometer sensor (`flutter_compass`).
