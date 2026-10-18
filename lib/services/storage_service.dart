@@ -43,6 +43,16 @@ class StorageService extends ChangeNotifier {
     await setActiveWaypointId(waypoint.id);
   }
 
+  Future<void> updateWaypoint(Waypoint updated) async {
+    final list = getWaypoints();
+    final index = list.indexWhere((item) => item.id == updated.id);
+    if (index != -1) {
+      list[index] = updated;
+      await _saveList(list);
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteWaypoint(String id) async {
     final list = getWaypoints();
     list.removeWhere((item) => item.id == id);

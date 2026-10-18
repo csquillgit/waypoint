@@ -11,6 +11,7 @@ class WaypointCard extends StatelessWidget {
   final bool useImperial;
   final VoidCallback onSelect;
   final VoidCallback onDelete;
+  final VoidCallback? onEdit;
 
   const WaypointCard({
     super.key,
@@ -18,6 +19,7 @@ class WaypointCard extends StatelessWidget {
     required this.isActive,
     required this.onSelect,
     required this.onDelete,
+    this.onEdit,
     this.currentLat,
     this.currentLon,
     this.useImperial = true,
@@ -62,6 +64,7 @@ class WaypointCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: onSelect,
+          onLongPress: onEdit,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
             child: Row(
@@ -200,11 +203,15 @@ class WaypointCard extends StatelessWidget {
                               style: TextStyle(color: Color(0xFF64748B)),
                             ),
                           ],
-                          Text(
-                            formattedDate,
-                            style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 12,
+                          Expanded(
+                            child: Text(
+                              formattedDate,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ],
@@ -213,34 +220,50 @@ class WaypointCard extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                const SizedBox(width: 4),
 
-                // Trailing Column: Selection indicator + Delete Button
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Radio / Checkmark Icon showing selection state
-                    Icon(
-                      isActive
-                          ? Icons.check_circle_rounded
-                          : Icons.radio_button_unchecked_rounded,
-                      color: isActive
-                          ? const Color(0xFF38BDF8)
-                          : const Color(0xFF475569),
-                      size: 22,
-                    ),
-                    const SizedBox(width: 2),
-
-                    // Delete Pin Button
-                    IconButton(
-                      icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Color(0xFFEF4444),
-                        size: 20,
+                // Trailing: Single 3-dots options menu
+                PopupMenuButton<String>(
+                  icon: const Icon(
+                    Icons.more_vert_rounded,
+                    color: Color(0xFF94A3B8),
+                    size: 22,
+                  ),
+                  splashRadius: 20,
+                  tooltip: 'Options',
+                  color: const Color(0xFF1E293B),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Color(0xFF334155)),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'edit' && onEdit != null) {
+                      onEdit!();
+                    } else if (value == 'delete') {
+                      onDelete();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    if (onEdit != null)
+                      const PopupMenuItem<String>(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined, color: Color(0xFF38BDF8), size: 18),
+                            SizedBox(width: 12),
+                            Text('Edit Pin', style: TextStyle(color: Colors.white, fontSize: 14)),
+                          ],
+                        ),
                       ),
-                      splashRadius: 20,
-                      tooltip: 'Delete pin',
-                      onPressed: onDelete,
+                    const PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 18),
+                          SizedBox(width: 12),
+                          Text('Delete Pin', style: TextStyle(color: Color(0xFFEF4444), fontSize: 14)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
