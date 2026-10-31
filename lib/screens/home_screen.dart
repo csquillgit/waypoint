@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/compass_service.dart';
 import '../services/location_service.dart';
 import '../services/storage_service.dart';
+import '../widgets/tactical_legal_sheet.dart';
 import 'history_screen.dart';
 import 'radar_screen.dart';
 
@@ -23,6 +24,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TacticalLegalSheet.checkFirstRun(context, waypointLegal);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
